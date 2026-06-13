@@ -1,0 +1,146 @@
+{% extends 'portal/base.html' %}
+
+{% block content %}
+    <div class="group-banner">
+        <h1 class="banner-title">Команда разработчиков: c/pyddit</h1>
+        <p class="banner-desc">Добро пожаловать на c/pyddit — координационный центр нашей команды. Здесь собраны все необходимые модули для совместной разработки, трекинга задач и код-ревью.</p>
+        <div class="banner-stats">
+            <span><strong>9</strong> модулей</span>
+            <span><strong>98%</strong> покрытие тестами</span>
+            <span><strong>15</strong> завершенных проектов</span>
+        </div>
+    </div>
+
+    <div class="feed-tabs">
+        <button class="tab-btn active"><i class="fas fa-fire"></i> Hot</button>
+        <button class="tab-btn"><i class="fas fa-sun"></i> New</button>
+        <button class="tab-btn"><i class="fas fa-chart-line"></i> Top</button>
+    </div>
+
+    <div class="snippet-grid">
+        
+        <div class="snippet-card">
+            <div class="snippet-header">
+                <span class="snippet-title"><i class="fas fa-bullhorn"></i> Последние Объявления</span>
+                <a href="{% url 'announcements_list' %}" style="font-size: 0.75rem; color: var(--accent-orange); font-weight: bold;">Все объявления →</a>
+            </div>
+            {% if announcements %}
+                <ul style="list-style: none; display: flex; flex-direction: column; gap: 10px;">
+                    {% for item in announcements %}
+                        <li style="border-left: 2px solid var(--accent-orange); padding-left: 10px; font-size: 0.85rem;">
+                            <a href="{% url 'announcement_detail' item.pk %}" style="font-weight: 600; color: white;">{{ item.title }}</a>
+                            <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 2px;">
+                                Категория: {{ item.get_category_display }} | Автор: {{ item.author_name }}
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="snippet-content">Объявлений пока нет.</p>
+            {% endif %}
+        </div>
+        <div class="snippet-card">
+            <div class="snippet-header">
+                <span class="snippet-title"><i class="fas fa-comments"></i> Форум разработчиков</span>
+                <a href="{% url 'mock_section' 'forum' %}" style="font-size: 0.75rem; color: var(--accent-orange); font-weight: bold;">Перейти к обсуждениям →</a>
+            </div>
+            <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px;">
+                {% for post in forum_posts %}
+                    <li style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.02); padding-bottom: 6px;">
+                        <span><i class="far fa-comment-alt" style="color: var(--text-secondary); margin-right: 6px;"></i> {{ post.title }}</span>
+                        <span style="font-size: 0.75rem; color: var(--text-secondary);">от <strong>{{ post.author }}</strong> | <i class="fas fa-arrow-up" style="color: var(--accent-orange);"></i> {{ post.votes }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="snippet-card">
+            <div class="snippet-header">
+                <span class="snippet-title"><i class="fas fa-tasks"></i> Оценки и трекинг задач</span>
+                <a href="{% url 'mock_section' 'diary' %}" style="font-size: 0.75rem; color: var(--accent-orange); font-weight: bold;">Открыть трекер →</a>
+            </div>
+            <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                {% for grade in grades %}
+                    <div style="flex: 1; background-color: var(--bg-page); border: 1px solid var(--border-color); padding: 10px; border-radius: var(--radius-sm); text-align: center; min-width: 100px;">
+                        <div style="font-size: 0.75rem; color: var(--text-secondary);">{{ grade.student }}</div>
+                        <div style="font-size: 1.2rem; font-weight: 700; color: #46d160; margin: 4px 0;">{{ grade.average }} / 12</div>
+                        <div style="font-size: 0.7rem; color: var(--text-muted);">{{ grade.grades_count }} тасков</div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="snippet-card">
+            <div class="snippet-header">
+                <span class="snippet-title"><i class="fas fa-calendar-alt"></i> Расписание спринтов и событий</span>
+                <a href="{% url 'mock_section' 'events' %}" style="font-size: 0.75rem; color: var(--accent-orange); font-weight: bold;">Календарь →</a>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+                {% for event in events %}
+                    <div style="background-color: var(--bg-page); border: 1px solid var(--border-color); padding: 12px; border-radius: var(--radius-sm);">
+                        <div style="font-weight: 600; font-size: 0.85rem; color: white; margin-bottom: 6px;">{{ event.title }}</div>
+                        <div style="font-size: 0.75rem; color: var(--text-secondary); display: flex; flex-direction: column; gap: 2px;">
+                            <span><i class="far fa-clock"></i> {{ event.date }} в {{ event.time }}</span>
+                            <span><i class="fas fa-map-marker-alt"></i> {{ event.place }}</span>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="snippet-card">
+                <div class="snippet-header">
+                    <span class="snippet-title"><i class="fas fa-poll"></i> Опросы</span>
+                </div>
+                <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 0.8rem;">
+                    {% for poll in mock_polls %}
+                        <li>
+                            <a href="{% url 'mock_section' 'polls' %}" style="color: white; font-weight: 500;">{{ poll.question }}</a>
+                            <div style="color: var(--text-secondary); font-size: 0.7rem; margin-top: 2px;">Проголосовало: {{ poll.votes }} разработчиков</div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="snippet-card">
+                <div class="snippet-header">
+                    <span class="snippet-title"><i class="fas fa-vote-yea"></i> Принятие решений</span>
+                </div>
+                <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 0.8rem;">
+                    {% for voting in mock_votings %}
+                        <li style="display: flex; justify-content: space-between; align-items: center;">
+                            <a href="{% url 'mock_section' 'votings' %}" style="color: white; font-weight: 500;">{{ voting.title }}</a>
+                            <span style="font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; background-color: {% if voting.status == 'Активно' %}rgba(70, 209, 96, 0.15){% else %}rgba(255,255,255,0.05){% endif %}; color: {% if voting.status == 'Активно' %}#46d160{% else %}var(--text-secondary){% endif %};">{{ voting.status }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="snippet-card">
+                <div class="snippet-header">
+                    <span class="snippet-title"><i class="fas fa-file-download"></i> Документация</span>
+                </div>
+                <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 0.8rem;">
+                    {% for mat in mock_materials %}
+                        <li style="display: flex; align-items: center; gap: 8px;">
+                            <i class="{% if mat.type == 'pdf' %}far fa-file-pdf{% else %}fas fa-link{% endif %}" style="color: var(--accent-orange); width: 14px;"></i>
+                            <a href="{% url 'mock_section' 'materials' %}" style="color: white;">{{ mat.name }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="snippet-card">
+                <div class="snippet-header">
+                    <span class="snippet-title"><i class="fas fa-briefcase"></i> Проекты команды</span>
+                </div>
+                <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 0.8rem;">
+                    {% for project in mock_portfolio %}
+                        <li>
+                            <a href="{% url 'mock_section' 'portfolio' %}" style="color: white; font-weight: 500;">{{ project.title }}</a>
+                            <div style="font-size: 0.7rem; color: var(--text-secondary); margin-top: 2px;">Автор: {{ project.author }}</div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}

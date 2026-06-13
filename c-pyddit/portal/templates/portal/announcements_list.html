@@ -1,0 +1,72 @@
+{% extends 'portal/base.html' %}
+
+{% block content %}
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 style="font-size: 1.5rem; font-weight: 700; color: white;">Раздел: g/announcements</h2>
+        <button class="btn btn-primary" onclick="document.getElementById('createModal').style.display='flex'">
+            <i class="fas fa-plus"></i> Создать Объявление
+        </button>
+    </div>
+
+    {% if announcements %}
+        {% for announcement in announcements %}
+            <article class="post-card">
+                
+                <div class="post-votes">
+                    <a href="{% url 'announcement_like' announcement.pk %}?dir=up" class="vote-arrow up">
+                        <i class="fas fa-arrow-up"></i>
+                    </a>
+                    <span class="vote-count {% if announcement.likes > 0 %}color-upvote{% elif announcement.likes < 0 %}color-downvote{% endif %}">
+                        {{ announcement.likes }}
+                    </span>
+                    <a href="{% url 'announcement_like' announcement.pk %}?dir=down" class="vote-arrow down">
+                        <i class="fas fa-arrow-down"></i>
+                    </a>
+                </div>
+                <div class="post-main">
+                    <div class="post-meta">
+                        <span class="tag-pill 
+                            {% if announcement.category == 'Important' %}tag-important
+                            {% elif announcement.category == 'Academic' %}tag-academic
+                            {% elif announcement.category == 'Event' %}tag-event
+                            {% else %}tag-general{% endif %}">
+                            {{ announcement.get_category_display }}
+                        </span>
+                        <span>Опубликовал</span>
+                        <span class="post-author">{{ announcement.author_name }}</span>
+                        <span>• {{ announcement.created_at|date:"d E Y, H:i" }}</span>
+                    </div>
+                    
+                    <h3 class="post-title">
+                        <a href="{% url 'announcement_detail' announcement.pk %}">{{ announcement.title }}</a>
+                    </h3>
+                    
+                    <p class="post-body">
+                        {{ announcement.content|linebreaksbr|truncatewords:40 }}
+                    </p>
+                    
+                    <div class="post-footer">
+                        <a href="{% url 'announcement_detail' announcement.pk %}" class="post-footer-btn">
+                            <i class="far fa-comment-alt"></i> {{ announcement.comments.count }} Комментариев
+                        </a>
+                        <button class="post-footer-btn"><i class="fas fa-share"></i> Поделиться</button>
+                        <div class="post-actions">
+                            <a href="{% url 'announcement_edit' announcement.pk %}" class="btn-action edit">
+                                <i class="fas fa-edit"></i> Ред.
+                            </a>
+                            <a href="{% url 'announcement_delete' announcement.pk %}" class="btn-action delete" onclick="return confirm('Вы уверены, что хотите исключить это объявление?');">
+                                <i class="fas fa-trash-alt"></i> Исключить
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </article>
+        {% endfor %}
+    {% else %}
+        <div class="widget" style="text-align: center; padding: 40px; border-style: dashed;">
+            <i class="fas fa-bullhorn" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 15px;"></i>
+            <p style="color: var(--text-secondary);">Объявлений пока нет. Нажмите кнопку выше, чтобы создать первое!</p>
+        </div>
+    {% endif %}
+{% endblock %}

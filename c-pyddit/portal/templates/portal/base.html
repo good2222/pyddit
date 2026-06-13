@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>c/pyddit - Портал Разработчиков</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'portal/css/styles.css' %}">
+</head>
+<body>
+    <div class="app-container">
+    
+        <header class="app-header">
+            <div class="header-left">
+                <a href="{% url 'home' %}" class="logo-area">
+                    <div class="logo-icon">p</div>
+                    <div class="logo-text">c/<span>pyddit</span></div>
+                </a>
+                <div class="search-bar">
+                    <i class="fas fa-search" style="color: var(--text-muted);"></i>
+                    <input type="text" placeholder="Поиск на c/pyddit">
+                </div>
+            </div>
+            
+            <div class="header-right">
+                <div class="role-badge">
+                    <i class="fas fa-user-shield"></i> {{ role }}
+                </div>
+                
+                <span style="font-size: 0.8rem; color: var(--text-secondary);">Тест прав:</span>
+                <select onchange="location = this.value;" class="role-switcher-dropdown">
+                    <option value="{% url 'set_role' 'User' %}" {% if role == 'User' %}selected{% endif %}>Пользователь</option>
+                    <option value="{% url 'set_role' 'Moderator' %}" {% if role == 'Moderator' %}selected{% endif %}>Модератор</option>
+                    <option value="{% url 'set_role' 'Admin' %}" {% if role == 'Admin' %}selected{% endif %}>Администратор</option>
+                </select>
+
+                <div style="display: flex; align-items: center; gap: 8px; border-left: 1px solid var(--border-color); padding-left: 15px;">
+                    <div style="width: 28px; height: 28px; background-color: var(--accent-orange); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85rem;">
+
+                    </div>
+                    <span style="font-size: 0.85rem; font-weight: 600; color: white;">Єгор</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="app-main">
+
+            <aside class="app-sidebar-left">
+                <div class="sidebar-title">Навигация</div>
+                <ul class="sidebar-menu">
+                    <li class="sidebar-item {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+                        <a href="{% url 'home' %}"><i class="fas fa-home"></i> Главная</a>
+                    </li>
+                    <li class="sidebar-item {% if request.resolver_match.url_name == 'announcements_list' or 'announcements' in request.path %}active{% endif %}">
+                        <a href="{% url 'announcements_list' %}"><i class="fas fa-bullhorn"></i> g/announcements</a>
+                    </li>
+                </ul>
+                
+                <div class="sidebar-title">Разделы портала</div>
+                <ul class="sidebar-menu">
+                    <li class="sidebar-item {% if 'forum' in request.path %}active{% endif %}">
+                        <a href="{% url 'mock_section' 'forum' %}"><i class="fas fa-comments"></i> g/forum</a>
+                    </li>
+                    <li class="sidebar-item {% if 'diary' in request.path %}active{% endif %}">
+                        <a href="{% url 'mock_section' 'diary' %}"><i class="fas fa-tasks"></i> g/diary</a>
+                    </li>
+                    <li class="sidebar-item {% if 'events' in request.path %}active{% endif %}">
+                        <a href="{% url 'mock_section' 'events' %}"><i class="fas fa-calendar-alt"></i> g/events</a>
+                    </li>
+                    <li class="sidebar-item {% if 'polls' in request.path %}active{% endif %}">
+                        <a href="{% url 'mock_section' 'polls' %}"><i class="fas fa-poll"></i> g/polls</a>
+                    </li>
+                    <li class="sidebar-item {% if 'votings' in request.path %}active{% endif %}">
+                        <a href="{% url 'mock_section' 'votings' %}"><i class="fas fa-vote-yea"></i> g/votings</a>
+                    </li>
+                    <li class="sidebar-item {% if 'materials' in request.path %}active{% endif %}">
+                        <a href="{% url 'mock_section' 'materials' %}"><i class="fas fa-file-download"></i> g/materials</a>
+                    </li>
+                    <li class="sidebar-item {% if 'portfolio' in request.path %}active{% endif %}">
+                        <a href="{% url 'mock_section' 'portfolio' %}"><i class="fas fa-briefcase"></i> g/portfolio</a>
+                    </li>
+                    <li class="sidebar-item {% if 'gallery' in request.path %}active{% endif %}">
+                        <a href="{% url 'mock_section' 'gallery' %}"><i class="fas fa-images"></i> g/gallery</a>
+                    </li>
+                    <li class="sidebar-item {% if 'auth' in request.path %}active{% endif %}">
+                        <a href="{% url 'mock_section' 'auth' %}"><i class="fas fa-user-lock"></i> g/auth</a>
+                    </li>
+                </ul>
+                
+                <button class="btn-sidebar-create" onclick="document.getElementById('createModal').style.display='flex'">
+                    <i class="fas fa-plus"></i> Объявление
+                </button>
+            </aside>
+
+            <section class="app-feed">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert-message">
+                            <i class="fas fa-info-circle"></i> {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                {% block content %}
+                {% endblock %}
+            </section>
+
+            <aside class="app-sidebar-right">
+                
+                <div class="widget">
+                    <div class="widget-header">О сообществе</div>
+                    <div style="margin-bottom: 12px; font-size: 0.9rem;">
+                        <strong>c/pyddit</strong> — официальный портал нашей команды разработчиков. Предназначен для координации задач бэкенда, фронтенда, код-ревью и демонстрации портфолио.
+                    </div>
+                    <div style="font-size: 0.8rem; color: var(--text-secondary); display: flex; flex-direction: column; gap: 4px;">
+                        <span><i class="far fa-calendar-alt"></i> Создан: 8 июня 2026 г.</span>
+                        <span><i class="fas fa-code-branch"></i> Ветки: 9 разделов</span>
+                        <span><i class="fas fa-circle" style="color: #46d160; font-size: 0.6rem;"></i> В сети: 9 активных</span>
+                    </div>
+                </div>
+
+                <div class="widget">
+                    <div class="widget-header">Правила Портала</div>
+                    <ol class="about-rules">
+                        <li>Соблюдать вежливость при обсуждениях.</li>
+                        <li>Не спамить и писать по теме разделов.</li>
+                        <li>Сдавать пул-реквесты на код-ревью вовремя.</li>
+                        <li>Не загружать пустые коммиты и темы.</li>
+                    </ol>
+                </div>
+            </aside>
+
+        </main>
+    </div>
+
+    <div id="createModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-title">Создать новое объявление</div>
+            <form action="{% url 'announcements_list' %}" method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="title">Заголовок</label>
+                    <input type="text" name="title" id="title" class="form-control" placeholder="Введите заголовок" required>
+                </div>
+                <div class="form-group">
+                    <label for="category">Категория</label>
+                    <select name="category" id="category" class="form-control">
+                        <option value="Important">Важное</option>
+                        <option value="General">Общее</option>
+                        <option value="Event">Событие</option>
+                        <option value="Academic">Учеба</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="author_name">Автор (Подпись)</label>
+                    <input type="text" name="author_name" id="author_name" class="form-control" value="Єгор (Lead Dev)" required>
+                </div>
+                <div class="form-group">
+                    <label for="content">Содержание</label>
+                    <textarea name="content" id="content" class="form-control" placeholder="Напишите текст объявления..." required></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="document.getElementById('createModal').style.display='none'">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Опубликовать</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

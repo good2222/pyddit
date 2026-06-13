@@ -1,0 +1,205 @@
+{% extends 'portal/base.html' %}
+
+{% block content %}
+    <div style="margin-bottom: 20px;">
+        <h2 style="font-size: 1.5rem; font-weight: 700; color: white;">Раздел: g/{{ section_name }}</h2>
+    </div>
+
+    <div class="mock-card">
+        <span class="mock-badge"><i class="fas fa-code-branch"></i> Раздел в разработке</span>
+        <h3 style="color: white; font-size: 1.15rem; margin-bottom: 8px;">
+            Ответственный за модуль: <strong style="color: var(--accent-orange);">{{ info.author }}</strong>
+        </h3>
+        <p class="mock-text">
+            <strong>Задача разработчика:</strong> {{ info.task }}
+        </p>
+        
+        <div style="margin-top: 20px;">
+            <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-primary); text-transform: uppercase; margin-bottom: 8px;">
+                <i class="fas fa-info-circle" style="color: var(--accent-blue);"></i> Инструкция для {{ info.author }} по интеграции:
+            </div>
+            <div class="mock-instruction">
+                # Шаги для подключения модуля к общей структуре c/pyddit:<br><br>
+                
+                1. В Django-приложении (например, '{{ section_name }}') в файле views.py создайте представления для этого раздела.<br>
+                2. Зарегистрируйте пути в {{ section_name }}/urls.py:<br>
+                &nbsp;&nbsp;&nbsp;urlpatterns = [<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;path('', views.index, name='{{ section_name }}_index'),<br>
+                &nbsp;&nbsp;&nbsp;]<br>
+                3. Замените заглушку в config/urls.py на реальный путь:<br>
+                &nbsp;&nbsp;&nbsp;path('g/{{ section_name }}/', include('{{ section_name }}.urls')),<br>
+                4. Шаблоны разместите в папке templates/{{ section_name }}/.<br>
+                5. Наследуйте базовую разметку Егора:<br>
+                &nbsp;&nbsp;&nbsp;{% raw %}{% extends 'portal/base.html' %}{% endraw %}<br>
+                &nbsp;&nbsp;&nbsp;{% raw %}{% block content %}{% endraw %}<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;!-- Ваш HTML-код здесь --&gt;<br>
+                &nbsp;&nbsp;&nbsp;{% raw %}{% endblock %}{% endraw %}
+            </div>
+        </div>
+    </div>
+
+    <div class="widget">
+        <div class="widget-header">Интерактивный прототип раздела (Виджет)</div>
+        
+        {% if section_name == 'forum' %}
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <div style="background-color: var(--bg-page); border: 1px solid var(--border-color); padding: 12px; border-radius: var(--radius-sm);">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 6px;">
+                        <span>Опубликовал: Макс</span>
+                        <span>12 ответов</span>
+                    </div>
+                    <h4 style="color: white; font-size: 0.9rem; margin-bottom: 6px;">Как сдавать курсовую работу? Какие требования по оформлению?</h4>
+                    <p style="font-size: 0.8rem; color: var(--text-secondary);">Привет всем, кто-то знает точный ГОСТ для оформления списка литературы? Скиньте файл или ссылку.</p>
+                </div>
+                <div style="background-color: var(--bg-page); border: 1px solid var(--border-color); padding: 12px; border-radius: var(--radius-sm);">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 6px;">
+                        <span>Опубликовал: Дмитрий</span>
+                        <span>4 ответа</span>
+                    </div>
+                    <h4 style="color: white; font-size: 0.9rem; margin-bottom: 6px;">Кто идет на хакатон в эту субботу?</h4>
+                    <p style="font-size: 0.8rem; color: var(--text-secondary);">Собираю команду из 3 человек. Нужен фронтендер и аналитик. Пишите в ЛС.</p>
+                </div>
+            </div>
+        {% elif section_name == 'diary' %}
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <div style="background-color: var(--bg-page); border: 1px solid var(--border-color); padding: 12px; border-radius: var(--radius-sm); display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h4 style="color: white; font-size: 0.9rem;">Лабораторная работа №3 (Django)</h4>
+                        <span style="font-size: 0.75rem; color: var(--text-secondary);">Оценил: Администратор</span>
+                    </div>
+                    <div style="font-size: 1.25rem; font-weight: 700; color: #46d160;">12 / 12</div>
+                </div>
+                <div style="background-color: var(--bg-page); border: 1px solid var(--border-color); padding: 12px; border-radius: var(--radius-sm); display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h4 style="color: white; font-size: 0.9rem;">Практическая работа по сетям</h4>
+                        <span style="font-size: 0.75rem; color: var(--text-secondary);">Оценил: Модератор</span>
+                    </div>
+                    <div style="font-size: 1.25rem; font-weight: 700; color: #46d160;">10 / 12</div>
+                </div>
+                <div style="text-align: center; margin-top: 10px;">
+                    <button class="btn btn-secondary" style="font-size: 0.8rem;"><i class="fas fa-plus"></i> Оценить студента</button>
+                </div>
+            </div>
+        {% elif section_name == 'events' %}
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <div style="background-color: var(--bg-page); border: 1px solid var(--border-color); padding: 12px; border-radius: var(--radius-sm); display: flex; gap: 12px; align-items: center;">
+                    <div style="background-color: var(--accent-orange); color: white; padding: 8px 12px; border-radius: 6px; text-align: center; min-width: 60px;">
+                        <span style="display: block; font-size: 0.7rem; font-weight: bold; text-transform: uppercase;">Июнь</span>
+                        <span style="display: block; font-size: 1.2rem; font-weight: 800;">16</span>
+                    </div>
+                    <div>
+                        <h4 style="color: white; font-size: 0.9rem; margin-bottom: 2px;">Защита групповых проектов</h4>
+                        <span style="font-size: 0.75rem; color: var(--text-secondary);"><i class="far fa-clock"></i> 14:00 | Ауд. 305</span>
+                    </div>
+                </div>
+                <div style="background-color: var(--bg-page); border: 1px solid var(--border-color); padding: 12px; border-radius: var(--radius-sm); display: flex; gap: 12px; align-items: center;">
+                    <div style="background-color: var(--border-color); color: var(--text-primary); padding: 8px 12px; border-radius: 6px; text-align: center; min-width: 60px;">
+                        <span style="display: block; font-size: 0.7rem; font-weight: bold; text-transform: uppercase;">Июнь</span>
+                        <span style="display: block; font-size: 1.2rem; font-weight: 800;">18</span>
+                    </div>
+                    <div>
+                        <h4 style="color: white; font-size: 0.9rem; margin-bottom: 2px;">Консультация к экзамену</h4>
+                        <span style="font-size: 0.75rem; color: var(--text-secondary);"><i class="far fa-clock"></i> 11:00 | Zoom</span>
+                    </div>
+                </div>
+            </div>
+        {% elif section_name == 'polls' %}
+            <div style="background-color: var(--bg-page); border: 1px solid var(--border-color); padding: 16px; border-radius: var(--radius-sm);">
+                <h4 style="color: white; font-size: 0.95rem; margin-bottom: 12px;">Какую тему для следующего проекта выбрать?</h4>
+                <form onsubmit="event.preventDefault(); alert('Голос учтен!');">
+                    <div class="form-group" style="display: flex; flex-direction: column; gap: 8px;">
+                        <label style="display: flex; align-items: center; gap: 8px; text-transform: none; color: var(--text-primary); font-weight: normal; cursor: pointer;">
+                            <input type="radio" name="mock_poll" value="1"> Разработка мобильного приложения
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; text-transform: none; color: var(--text-primary); font-weight: normal; cursor: pointer;">
+                            <input type="radio" name="mock_poll" value="2"> Разработка Telegram бота на AI
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; text-transform: none; color: var(--text-primary); font-weight: normal; cursor: pointer;">
+                            <input type="radio" name="mock_poll" value="3"> Разработка десктопной игры на C#
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="margin-top: 10px; font-size: 0.8rem;">Проголосовать</button>
+                </form>
+            </div>
+        {% elif section_name == 'votings' %}
+            <div style="background-color: var(--bg-page); border: 1px solid var(--border-color); padding: 16px; border-radius: var(--radius-sm);">
+                <h4 style="color: white; font-size: 0.95rem; margin-bottom: 8px;">Выборы старосты группы (Второй тур)</h4>
+                <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;">
+                    <div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 4px;">
+                            <span>Кандидат 1: Егор</span>
+                            <strong>58% (14 голосов)</strong>
+                        </div>
+                        <div style="width: 100%; height: 8px; background-color: var(--border-color); border-radius: 4px; overflow: hidden;">
+                            <div style="width: 58%; height: 100%; background-color: var(--accent-orange);"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 4px;">
+                            <span>Кандидат 2: Дмитрий</span>
+                            <strong>42% (10 голосов)</strong>
+                        </div>
+                        <div style="width: 100%; height: 8px; background-color: var(--border-color); border-radius: 4px; overflow: hidden;">
+                            <div style="width: 42%; height: 100%; background-color: var(--accent-blue);"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% elif section_name == 'materials' %}
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div style="background-color: var(--bg-page); border: 1px solid var(--border-color); padding: 12px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: space-between;">
+                    <div>
+                        <h4 style="color: white; font-size: 0.85rem; margin-bottom: 2px;"><i class="far fa-file-pdf" style="color: var(--accent-orange); margin-right: 6px;"></i> Лекция 5 - Базы данных</h4>
+                        <span style="font-size: 0.7rem; color: var(--text-secondary);">Размер: 1.4 MB | Добавлено: Вчера</span>
+                    </div>
+                    <button class="btn btn-secondary" style="font-size: 0.75rem;"><i class="fas fa-download"></i></button>
+                </div>
+                <div style="background-color: var(--bg-page); border: 1px solid var(--border-color); padding: 12px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: space-between;">
+                    <div>
+                        <h4 style="color: white; font-size: 0.85rem; margin-bottom: 2px;"><i class="fas fa-link" style="color: var(--accent-orange); margin-right: 6px;"></i> Документация Django 6.0</h4>
+                        <span style="font-size: 0.7rem; color: var(--text-secondary);">Тип: Веб-ссылка | Добавлено: 3 дня назад</span>
+                    </div>
+                    <button class="btn btn-secondary" style="font-size: 0.75rem;"><i class="fas fa-external-link-alt"></i></button>
+                </div>
+            </div>
+        {% elif section_name == 'portfolio' %}
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+                <div style="background-color: var(--bg-page); border: 1px solid var(--border-color); padding: 16px; border-radius: var(--radius-sm);">
+                    <h4 style="color: white; font-size: 0.95rem; margin-bottom: 4px;">c/pyddit - Портал Нашей Группы</h4>
+                    <span style="font-size: 0.75rem; color: var(--accent-orange); font-weight: bold; display: block; margin-bottom: 8px;">Авторы: Єгор, Дмитрий, Макс и др.</span>
+                    <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 12px;">Коллективный проект портала группы в виде Reddit на Django с Amoled-темной темой.</p>
+                    <div style="display: flex; gap: 8px;">
+                        <span style="font-size: 0.7rem; background-color: rgba(255,255,255,0.03); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border-color);">Django</span>
+                        <span style="font-size: 0.7rem; background-color: rgba(255,255,255,0.03); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border-color);">Vanilla CSS</span>
+                    </div>
+                </div>
+            </div>
+        {% elif section_name == 'gallery' %}
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px;">
+                <div style="background-color: var(--bg-page); border: 1px solid var(--border-color); border-radius: var(--radius-sm); overflow: hidden;">
+                    <img src="https://picsum.photos/id/1/300/200" style="width: 100%; height: 100px; object-fit: cover;" alt="Фото">
+                    <div style="padding: 8px; font-size: 0.75rem; color: var(--text-primary);">Сдача курсовых работ</div>
+                </div>
+                <div style="background-color: var(--bg-page); border: 1px solid var(--border-color); border-radius: var(--radius-sm); overflow: hidden;">
+                    <img src="https://picsum.photos/id/10/300/200" style="width: 100%; height: 100px; object-fit: cover;" alt="Фото">
+                    <div style="padding: 8px; font-size: 0.75rem; color: var(--text-primary);">Горы, летний поход 2025</div>
+                </div>
+            </div>
+        {% elif section_name == 'auth' %}
+            <div style="background-color: var(--bg-page); border: 1px solid var(--border-color); padding: 20px; border-radius: var(--radius-sm); max-width: 400px; margin: 0 auto;">
+                <h4 style="color: white; font-size: 1.1rem; margin-bottom: 15px; text-align: center;">Авторизация на портале</h4>
+                <form onsubmit="event.preventDefault();">
+                    <div class="form-group">
+                        <label for="username">Имя пользователя (Логин)</label>
+                        <input type="text" id="username" class="form-control" placeholder="Введите логин">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Пароль</label>
+                        <input type="password" id="password" class="form-control" placeholder="Введите пароль">
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">Войти</button>
+                </form>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

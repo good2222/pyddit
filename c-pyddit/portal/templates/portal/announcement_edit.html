@@ -1,0 +1,44 @@
+{% extends 'portal/base.html' %}
+
+{% block content %}
+    <div style="margin-bottom: 15px;">
+        <a href="{% url 'announcements_list' %}" style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 700;">
+            <i class="fas fa-arrow-left"></i> Назад к ленте объявлений
+        </a>
+    </div>
+
+    <div class="widget">
+        <h2 style="font-size: 1.25rem; font-weight: 700; color: white; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+            Редактировать объявление
+        </h2>
+        
+        <form action="{% url 'announcement_edit' announcement.pk %}" method="POST">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="title">Заголовок</label>
+                <input type="text" name="title" id="title" class="form-control" value="{{ announcement.title }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="category">Категория</label>
+                <select name="category" id="category" class="form-control">
+                    <option value="Important" {% if announcement.category == 'Important' %}selected{% endif %}>Важное</option>
+                    <option value="General" {% if announcement.category == 'General' %}selected{% endif %}>Общее</option>
+                    <option value="Event" {% if announcement.category == 'Event' %}selected{% endif %}>Событие</option>
+                    <option value="Academic" {% if announcement.category == 'Academic' %}selected{% endif %}>Учеба</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="content">Содержание</label>
+                <textarea name="content" id="content" class="form-control" required>{{ announcement.content }}</textarea>
+            </div>
+            
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+                <a href="{% url 'announcements_list' %}" class="btn btn-secondary" style="display: flex; align-items: center; justify-content: center;">Отмена</a>
+            </div>
+        </form>
+    </div>
+{% endblock %}
