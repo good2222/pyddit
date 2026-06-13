@@ -48,3 +48,15 @@ class Comment(models.Model):
         ordering = ['created_at']
         verbose_name = "Комментарий"
         verbose_name_plural = "Комментарии"
+class User(models.Model):
+    username = models.CharField(max_length=150, unique=True, verbose_name="Имя пользователя")
+    email = models.EmailField(unique=True, verbose_name="Электронная почта")
+    password = models.CharField(max_length=128, verbose_name="Пароль")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата регистрации")
+
+    def __str__(self):
+        return self.username
+
+    class Meta:
+        verbose_name = "Пользователь"
+        verbose_name_plural = "Пользователи"

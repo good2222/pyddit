@@ -1,8 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from .models import Announcement, Comment
+from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
+from django.contrib.auth.views import LoginView
+from django.urls import reverse_lazy
+from .models import Announcement, Comment, User
+from .forms import UserRegisterForm
 from django.http import HttpResponseForbidden
-
+from django.contrib.auth import logout
 def get_current_role(request):
     return request.session.get('role', 'User')  
 
@@ -271,3 +275,19 @@ def mock_section(request, section_name):
         'info': info
     }
     return render(request, 'portal/mock_section.html', context)
+
+class UserRegisterView(CreateView):
+    model = User
+    form_class = UserRegisterForm
+    template_name = 'portal/register.html'
+    success_url = reverse_lazy('home')
+
+class UserLoginView(LoginView):
+    template_name = 'portal/login.html'
+    redirect_authenticated_user = True
+
+
+def logout_view(request):
+    """Log out the user and redirect to home. Accepts GET and POST."""
+    logout(request)
+    return redirect('home')

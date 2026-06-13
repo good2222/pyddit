@@ -11,6 +11,8 @@ urlpatterns = [
     path('announcements/<int:pk>/edit/', views.announcement_edit, name='announcement_edit'),
     path('announcements/<int:pk>/delete/', views.announcement_delete, name='announcement_delete'),
     path('announcements/<int:pk>/like/', views.announcement_like, name='announcement_like'),
-
+    path('login/', views.UserLoginView.as_view(), name='login'),
+    path('logout/', views.logout_view, name='logout'),
+    path('register/', views.UserRegisterView.as_view(), name='register'),
     path('g/<str:section_name>/', views.mock_section, name='mock_section'),
 ]
