@@ -1,14 +1,24 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
+from django.views.generic import CreateView
+from django.contrib.auth import get_user_model, logout, update_session_auth_hash
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.models import Group
 from django.contrib.auth.views import LoginView
 from django.urls import reverse_lazy
-from .models import Announcement, Comment, User
-from .forms import UserRegisterForm
+from .forms import UserLoginForm, UserRegisterForm, UserProfileForm, UserPasswordChangeForm
+from .models import Announcement, Comment
 from django.http import HttpResponseForbidden
-from django.contrib.auth import logout
+
 def get_current_role(request):
-    return request.session.get('role', 'User')  
+    if request.user.is_authenticated:
+        if request.user.is_superuser:
+            return 'Admin'
+        if request.user.groups.filter(name='Moderator').exists():
+            return 'Moderator'
+        return 'User'
+    return request.session.get('role', 'User')
+
 
 def home_view(request):
     role = get_current_role(request)
@@ -97,6 +107,37 @@ def set_role(request, role):
         request.session['role'] = role
         messages.success(request, f"Роль изменена на: {role}")
     return redirect(request.META.get('HTTP_REFERER', 'home'))
+
+
+def ensure_moderator_group():
+    group, _ = Group.objects.get_or_create(name='Moderator')
+    return group
+
+@user_passes_test(lambda u: u.is_superuser, login_url='login')
+def manage_moderators(request):
+    User = get_user_model()
+    group = ensure_moderator_group()
+    users = User.objects.all().order_by('username')
+
+    if request.method == 'POST':
+        user_id = request.POST.get('user_id')
+        action = request.POST.get('action')
+        if user_id and action:
+            target = get_object_or_404(User, pk=user_id)
+            if action == 'grant':
+                group.user_set.add(target)
+                messages.success(request, f'Пользователь {target.username} получил роль модератора.')
+            elif action == 'revoke':
+                group.user_set.remove(target)
+                messages.success(request, f'Роль модератора снята с пользователя {target.username}.')
+            return redirect('manage_moderators')
+
+    context = {
+        'role': get_current_role(request),
+        'users': users,
+        'group': group,
+    }
+    return render(request, 'portal/role_management.html', context)
 
 
 def announcements_list(request):
@@ -276,13 +317,55 @@ def mock_section(request, section_name):
     }
     return render(request, 'portal/mock_section.html', context)
 
+@login_required(login_url='login')
+def profile_view(request):
+    context = {
+        'role': get_current_role(request),
+    }
+    return render(request, 'portal/profile.html', context)
+
+@login_required(login_url='login')
+def profile_edit(request):
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Профиль успешно обновлен.')
+            return redirect('profile')
+    else:
+        form = UserProfileForm(instance=request.user)
+
+    context = {
+        'role': get_current_role(request),
+        'form': form,
+    }
+    return render(request, 'portal/profile_edit.html', context)
+
+@login_required(login_url='login')
+def profile_password_change(request):
+    if request.method == 'POST':
+        form = UserPasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)
+            messages.success(request, 'Пароль успешно изменен.')
+            return redirect('profile')
+    else:
+        form = UserPasswordChangeForm(request.user)
+
+    context = {
+        'role': get_current_role(request),
+        'form': form,
+    }
+    return render(request, 'portal/password_change.html', context)
+
 class UserRegisterView(CreateView):
-    model = User
     form_class = UserRegisterForm
     template_name = 'portal/register.html'
-    success_url = reverse_lazy('home')
+    success_url = reverse_lazy('login')
 
 class UserLoginView(LoginView):
+    form_class = UserLoginForm
     template_name = 'portal/login.html'
     redirect_authenticated_user = True
 

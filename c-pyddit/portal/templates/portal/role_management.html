@@ -1,0 +1,67 @@
+{% extends 'portal/base.html' %}
+
+{% block content %}
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1 class="auth-title">Управление ролями</h1>
+            <p class="auth-subtitle">Только суперпользователь может выдавать или отзывать роль модератора.</p>
+        </div>
+
+        <div class="form-group">
+            <div class="profile-row" style="margin-bottom: 16px;">
+                <strong>Всего пользователей:</strong> {{ users.count }}
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="role-table">
+                <thead>
+                    <tr>
+                        <th>Имя пользователя</th>
+                        <th>Почта</th>
+                        <th>Роль</th>
+                        <th>Действие</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user_item in users %}
+                        <tr>
+                            <td>{{ user_item.username }}</td>
+                            <td>{{ user_item.email|default:'-' }}</td>
+                            <td>
+                                {% if user_item.is_superuser %}
+                                    Superuser
+                                {% elif user_item.groups.filter(name='Moderator').exists %}
+                                    Moderator
+                                {% else %}
+                                    User
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if not user_item.is_superuser %}
+                                    <form method="post" style="display:inline-block;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="user_id" value="{{ user_item.id }}">
+                                        {% if user_item.groups.filter(name='Moderator').exists %}
+                                            <input type="hidden" name="action" value="revoke">
+                                            <button type="submit" class="btn btn-secondary">Отозвать модератора</button>
+                                        {% else %}
+                                            <input type="hidden" name="action" value="grant">
+                                            <button type="submit" class="btn btn-primary">Сделать модератором</button>
+                                        {% endif %}
+                                    </form>
+                                {% else %}
+                                    <span style="color: var(--text-secondary);">недоступно</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="auth-aux" style="margin-top: 24px;">
+            <a href="{% url 'home' %}" class="auth-link">Вернуться на главную</a>
+        </div>
+    </div>
+{% endblock %}

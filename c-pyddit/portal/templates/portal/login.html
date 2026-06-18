@@ -18,7 +18,7 @@
         <form method="post" novalidate>
             {% csrf_token %}
 
-            <div class="form-group">
+                <div class="form-group">
                 <label for="{{ form.username.id_for_label }}">Имя пользователя</label>
                 {{ form.username }}
                 {% if form.username.errors %}
@@ -39,7 +39,7 @@
 
         <div class="auth-aux">
             <span>Нет аккаунта?</span>
-            <a href="{% url 'register' %}" class="auth-link">Зарегистрироваться</a>
+            <a href="{% url 'register' %}" class="btn btn-secondary" style="padding: 10px 16px;">Зарегистрироваться</a>
         </div>
     </div>
 {% endblock %}

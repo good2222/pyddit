@@ -1,7 +1,7 @@
 {% extends 'portal/base.html' %}
 
 {% block content %}
-    <div class="auth-card">
+    <div class="auth-card auth-card-register">
         <div class="auth-header">
             <h1 class="auth-title">Регистрация</h1>
             <p class="auth-subtitle">Создайте аккаунт, чтобы участвовать на портале и оставлять объявления.</p>
@@ -31,6 +31,22 @@
                 {{ form.email }}
                 {% if form.email.errors %}
                     <div class="field-error">{{ form.email.errors|striptags }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.first_name.id_for_label }}">Имя (опционально)</label>
+                {{ form.first_name }}
+                {% if form.first_name.errors %}
+                    <div class="field-error">{{ form.first_name.errors|striptags }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.last_name.id_for_label }}">Фамилия (опционально)</label>
+                {{ form.last_name }}
+                {% if form.last_name.errors %}
+                    <div class="field-error">{{ form.last_name.errors|striptags }}</div>
                 {% endif %}
             </div>
 

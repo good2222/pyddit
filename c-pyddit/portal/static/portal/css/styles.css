@@ -47,9 +47,7 @@ text-decoration: none;
 transition: color 0.2s ease;
 }
 
-a:hover {
-color: var(--accent-orange);
-}
+
 
 button, input, textarea, select {
 font-family: inherit;
@@ -656,7 +654,7 @@ color: white;
 }
 
 .btn-primary:hover {
-background-color: var(--accent-orange-hover);
+background-color: var(--accent-orange);
 }
 
 .auth-card {
@@ -709,6 +707,21 @@ transition: color 0.2s ease;
 
 .auth-link:hover {
 color: var(--accent-orange);
+}
+
+.auth-card-register .form-control[type="password"] {
+background-color: #121315;
+color: var(--text-primary);
+border-color: var(--border-hover);
+}
+
+.auth-card-register .form-control[type="password"]::placeholder {
+color: var(--text-secondary);
+}
+
+.auth-card-register .form-control[type="password"]:focus {
+border-color: var(--accent-blue);
+box-shadow: 0 0 0 4px rgba(0, 121, 211, 0.12);
 }
 
 .form-errors {
