@@ -65,8 +65,8 @@
                 
                 <div class="sidebar-title">Разделы портала</div>
                 <ul class="sidebar-menu">
-                    <li class="sidebar-item {% if 'forum' in request.path %}active{% endif %}">
-                        <a href="{% url 'mock_section' 'forum' %}"><i class="fas fa-comments"></i> g/forum</a>
+                    <li class="sidebar-item {% if 'grades' in request.path %}active{% endif %}">
+                        <a href="{% url 'grades_list' %}"><i class="fas fa-chart-line"></i> g/diary</a>
                     </li>
                     <li class="sidebar-item {% if 'diary' in request.path %}active{% endif %}">
                         <a href="{% url 'mock_section' 'diary' %}"><i class="fas fa-tasks"></i> g/diary</a>

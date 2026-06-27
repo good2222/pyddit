@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from .models import Announcement, Comment
+from .models import Announcement, Comment, Grade
 from django.http import HttpResponseForbidden
+from datetime import date
 
 def get_current_role(request):
     return request.session.get('role', 'User')  
@@ -79,10 +80,10 @@ def home_view(request):
         'forum_posts': mock_forum_posts,
         'grades': mock_grades,
         'events': mock_events,
-        'polls': mock_polls,
-        'votings': mock_votings,
-        'materials': mock_materials,
-        'portfolio': mock_portfolio,
+        'mock_polls': mock_polls,
+        'mock_votings': mock_votings,
+        'mock_materials': mock_materials,
+        'mock_portfolio': mock_portfolio,
         'gallery': mock_gallery,
     }
     return render(request, 'portal/home.html', context)
@@ -271,3 +272,73 @@ def mock_section(request, section_name):
         'info': info
     }
     return render(request, 'portal/mock_section.html', context)
+
+def grades_list(request):
+    role = get_current_role(request)
+    grades = Grade.objects.all()
+    
+    # If POST request to create new grade
+    if request.method == "POST":
+        student_name = request.POST.get('student_name')
+        author_name = request.POST.get('author_name', f"Разработчик ({role})")
+        
+        if not student_name:
+            messages.error(request, "Имя студента не может быть пустым!")
+        else:
+            Grade.objects.create(
+                student_name=student_name,
+                author_name=author_name,
+                total_score=1  # Start with 1 point
+            )
+            messages.success(request, "Оценка успешно создана! (начальный балл: 1)")
+            return redirect('grades_list')
+    
+    context = {
+        'role': role,
+        'grades': grades,
+    }
+    return render(request, 'portal/grades_list.html', context)
+
+
+def grade_like(request, pk):
+    role = get_current_role(request)
+    grade = get_object_or_404(Grade, pk=pk)
+    
+    # Only admins can directly change grades, others can vote once per day
+    if role == 'Admin':
+        grade.like()
+        messages.success(request, "Оценка увеличена на 1 балл")
+    else:
+        # Check if user already voted today
+        today = date.today()
+        if grade.last_vote_date == today:
+            messages.error(request, "Вы уже голосовали сегодня! Попробуйте завтра.")
+        else:
+            grade.like()
+            grade.last_vote_date = today
+            grade.save()
+            messages.success(request, "Спасибо за голос! +1 балл")
+    
+    return redirect(request.META.get('HTTP_REFERER', 'grades_list'))
+
+
+def grade_dislike(request, pk):
+    role = get_current_role(request)
+    grade = get_object_or_404(Grade, pk=pk)
+    
+    # Only admins can directly change grades, others can vote once per day
+    if role == 'Admin':
+        grade.dislike()
+        messages.success(request, "Оценка уменьшена на 1 балл")
+    else:
+        # Check if user already voted today
+        today = date.today()
+        if grade.last_vote_date == today:
+            messages.error(request, "Вы уже голосовали сегодня! Попробуйте завтра.")
+        else:
+            grade.dislike()
+            grade.last_vote_date = today
+            grade.save()
+            messages.success(request, "Спасибо за голос! -1 балл")
+    
+    return redirect(request.META.get('HTTP_REFERER', 'grades_list'))
