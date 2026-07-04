@@ -374,3 +374,7 @@ def logout_view(request):
     """Log out the user and redirect to home. Accepts GET and POST."""
     logout(request)
     return redirect('home')
+
+
+
+#comment
