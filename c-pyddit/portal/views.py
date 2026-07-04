@@ -2,9 +2,14 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .models import Announcement, Comment
 from django.http import HttpResponseForbidden
+from django.db.models import Q
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 def get_current_role(request):
     return request.session.get('role', 'User')  
+
+
+
 
 def home_view(request):
     role = get_current_role(request)
@@ -14,7 +19,7 @@ def home_view(request):
             title="Запуск группового репозитория c/pyddit",
             content="Приветствуем всех разработчиков! Этот портал спроектирован в стиле Reddit для координации работы над общим проектом. Вы можете переключаться между модулями в левом сайдбаре и тестировать функционал публикаций.",
             category="Important",
-            author_name="Егор (Lead Dev)"
+            author_name="Егор"
         )
         Announcement.objects.create(
             title="Код-ревью пул-реквестов по Django до пятницы",
@@ -29,7 +34,13 @@ def home_view(request):
             author_name="Разработчик"
         )
 
-    announcements = Announcement.objects.all()[:3]
+    sort_by = request.GET.get('sort', 'hot')
+    if sort_by == 'new':
+        announcements = Announcement.objects.all().order_by('-is_pinned', '-created_at')[:3]
+    elif sort_by == 'top':
+        announcements = Announcement.objects.all().order_by('-is_pinned', '-likes', '-created_at')[:3]
+    else: # hot
+        announcements = Announcement.objects.all().order_by('-is_pinned', '-likes', '-created_at')[:3]
 
     mock_forum_posts = [
         {"title": "Как настроить Docker для Django и PostgreSQL?", "author": "dev_ninja", "replies": 12, "votes": 25},
@@ -84,6 +95,7 @@ def home_view(request):
         'materials': mock_materials,
         'portfolio': mock_portfolio,
         'gallery': mock_gallery,
+        'sort_by': sort_by,
     }
     return render(request, 'portal/home.html', context)
 
@@ -97,8 +109,29 @@ def set_role(request, role):
 
 def announcements_list(request):
     role = get_current_role(request)
-    announcements = Announcement.objects.all()
     
+    q = request.GET.get('q', '')
+    if q:
+        announcements = Announcement.objects.filter(
+            Q(title__icontains=q) | Q(content__icontains=q)
+        )
+    else:
+        announcements = Announcement.objects.all()
+        
+    sort_by = request.GET.get('sort', 'hot')
+    if sort_by == 'new':
+        announcements = announcements.order_by('-is_pinned', '-created_at')
+    elif sort_by == 'top':
+        announcements = announcements.order_by('-is_pinned', '-likes', '-created_at')
+    else: # hot
+        announcements = announcements.order_by('-is_pinned', '-likes', '-created_at')
+    
+    paginator = Paginator(announcements, 5)
+    page_num = request.GET.get('page')
+
+    page_obj = paginator.get_page(page_num)
+
+
     if request.method == "POST":
         title = request.POST.get('title')
         content = request.POST.get('content')
@@ -118,8 +151,11 @@ def announcements_list(request):
             return redirect('announcements_list')
 
     context = {
+        'page_obj': page_obj,
         'role': role,
         'announcements': announcements,
+        'sort_by': sort_by,
+        'q': q,
     }
     return render(request, 'portal/announcements_list.html', context)
 
@@ -271,3 +307,14 @@ def mock_section(request, section_name):
         'info': info
     }
     return render(request, 'portal/mock_section.html', context)
+
+
+def announcement_pin(request, pk):
+    role = get_current_role(request)
+    if role not in ['Admin', 'Moderator']:
+        return HttpResponseForbidden("У вас нет прав для этого действия.")
+    announcement = get_object_or_404(Announcement, pk=pk)
+    announcement.is_pinned = not announcement.is_pinned
+    announcement.save()
+    messages.success(request, f"Статус закрепления объявления изменен!")
+    return redirect(request.META.get('HTTP_REFERER', 'announcements_list'))

@@ -8,8 +8,14 @@
         </button>
     </div>
 
+    <div class="feed-tabs" style="margin-bottom: 20px;">
+        <a href="?sort=hot{% if q %}&q={{ q }}{% endif %}" class="tab-btn {% if sort_by == 'hot' or not sort_by %}active{% endif %}"><i class="fas fa-fire"></i> Hot</a>
+        <a href="?sort=new{% if q %}&q={{ q }}{% endif %}" class="tab-btn {% if sort_by == 'new' %}active{% endif %}"><i class="fas fa-sun"></i> New</a>
+        <a href="?sort=top{% if q %}&q={{ q }}{% endif %}" class="tab-btn {% if sort_by == 'top' %}active{% endif %}"><i class="fas fa-chart-line"></i> Top</a>
+    </div>
+
     {% if announcements %}
-        {% for announcement in announcements %}
+        {% for announcement in page_obj %}
             <article class="post-card">
                 
                 <div class="post-votes">
@@ -38,6 +44,11 @@
                     </div>
                     
                     <h3 class="post-title">
+                        {% if announcement.is_pinned %}
+                            <span class="pinned-badge" style="color: var(--accent-orange); margin-right: 8px; font-size: 0.9rem;" title="Закреплено">
+                                <i class="fas fa-thumbtack"></i>
+                            </span>
+                        {% endif %}
                         <a href="{% url 'announcement_detail' announcement.pk %}">{{ announcement.title }}</a>
                     </h3>
                     
@@ -51,18 +62,38 @@
                         </a>
                         <button class="post-footer-btn"><i class="fas fa-share"></i> Поделиться</button>
                         <div class="post-actions">
-                            <a href="{% url 'announcement_edit' announcement.pk %}" class="btn-action edit">
-                                <i class="fas fa-edit"></i> Ред.
-                            </a>
-                            <a href="{% url 'announcement_delete' announcement.pk %}" class="btn-action delete" onclick="return confirm('Вы уверены, что хотите исключить это объявление?');">
-                                <i class="fas fa-trash-alt"></i> Исключить
-                            </a>
+                            {% if role == 'Admin' or role == 'Moderator' %}
+                                <a href="{% url 'announcement_pin' announcement.pk %}" class="btn-action pin" style="color: var(--text-secondary); margin-right: 8px;">
+                                    {% if announcement.is_pinned %}
+                                        <i class="fas fa-thumbtack" style="color: var(--accent-orange);"></i> Открепить
+                                    {% else %}
+                                        <i class="fas fa-thumbtack"></i> Закрепить
+                                    {% endif %}
+                                </a>
+                                <a href="{% url 'announcement_edit' announcement.pk %}" class="btn-action edit">
+                                    <i class="fas fa-edit"></i> Ред.
+                                </a>
+                                <a href="{% url 'announcement_delete' announcement.pk %}" class="btn-action delete" onclick="return confirm('Вы уверены, что хотите исключить это объявление?');">
+                                    <i class="fas fa-trash-alt"></i> Исключить
+                                </a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
 
             </article>
         {% endfor %}
+
+        <div class="pagination">
+            {% for page in page_obj.paginator.page_range %}
+                {% if page == page_obj.number %}
+                    <span class="pagination-btn active">{{ page }}</span>
+                {% else %}
+                    <a href="?page={{ page }}{% if sort_by %}&sort={{ sort_by }}{% endif %}{% if q %}&q={{ q }}{% endif %}" class="pagination-btn">{{ page }}</a>
+                {% endif %}
+            {% endfor %}
+        </div>
+
     {% else %}
         <div class="widget" style="text-align: center; padding: 40px; border-style: dashed;">
             <i class="fas fa-bullhorn" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 15px;"></i>
