@@ -1,0 +1,53 @@
+{% extends 'portal/base.html' %}
+
+{% block content %}
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 style="font-size: 1.5rem; font-weight: 700; color: white;">Раздел: g/diary — Оценки</h2>
+    </div>
+
+    <div class="widget" style="margin-bottom: 20px;">
+        <div class="widget-header">Добавить оценку</div>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="student_name">Имя студента</label>
+                <input type="text" name="student_name" id="student_name" class="form-control" placeholder="Введите имя" required>
+            </div>
+            <div class="form-group">
+                <label for="author_name">Автор (Подпись)</label>
+                <input type="text" name="author_name" id="author_name" class="form-control" placeholder="Ваше имя">
+            </div>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i> Создать оценку</button>
+        </form>
+    </div>
+
+    {% if grades %}
+        {% for grade in grades %}
+            <article class="post-card">
+                <div class="post-votes">
+                    <a href="{% url 'grade_like' grade.pk %}" class="vote-arrow up">
+                        <i class="fas fa-arrow-up"></i>
+                    </a>
+                    <span class="vote-count color-upvote">{{ grade.total_score }}</span>
+                    <a href="{% url 'grade_dislike' grade.pk %}" class="vote-arrow down">
+                        <i class="fas fa-arrow-down"></i>
+                    </a>
+                </div>
+                <div class="post-main">
+                    <div class="post-meta">
+                        <span>Оценил</span>
+                        <span class="post-author">{{ grade.author_name }}</span>
+                        <span>• {{ grade.updated_at|date:"d E Y, H:i" }}</span>
+                    </div>
+                    <h3 class="post-title">{{ grade.student_name }}</h3>
+                    <p class="post-body">Текущий балл: {{ grade.total_score }} / 12</p>
+                </div>
+            </article>
+        {% endfor %}
+    {% else %}
+        <div class="widget" style="text-align: center; padding: 40px; border-style: dashed;">
+            <i class="fas fa-chart-line" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 15px;"></i>
+            <p style="color: var(--text-secondary);">Оценок пока нет. Добавьте первую с помощью формы выше!</p>
+        </div>
+    {% endif %}
+{% endblock %}

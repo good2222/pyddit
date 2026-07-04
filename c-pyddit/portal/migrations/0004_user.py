@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('portal', '0001_initial'),
+        ('portal', '0003_grade_last_vote_date_alter_grade_total_score'),
     ]
 
     operations = [
