@@ -41,11 +41,19 @@
                     <option value="{% url 'set_role' 'Admin' %}" {% if role == 'Admin' %}selected{% endif %}>Администратор</option>
                 </select>
 
-                <div style="display: flex; align-items: center; gap: 8px; border-left: 1px solid var(--border-color); padding-left: 15px;">
-                    <div style="width: 28px; height: 28px; background-color: var(--accent-orange); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85rem;">
-
-                    </div>
-                    <span style="font-size: 0.85rem; font-weight: 600; color: white;">Єгор</span>
+                <div style="display: flex; align-items: center; gap: 12px; border-left: 1px solid var(--border-color); padding-left: 15px;">
+                    {% if user.is_authenticated %}
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <div style="width: 28px; height: 28px; background-color: var(--accent-orange); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85rem; color: white;">
+                                {{ user.username|slice:":1"|upper }}
+                            </div>
+                            <span style="font-size: 0.85rem; font-weight: 600; color: white;">{{ user.username }}</span>
+                            <a href="{% url 'logout' %}" class="btn btn-secondary" style="font-size: 0.8rem; padding:6px 10px;">Выйти</a>
+                        </div>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="btn btn-secondary" style="font-size: 0.85rem;">Войти</a>
+                        <a href="{% url 'register' %}" class="btn btn-primary" style="font-size: 0.85rem;">Регистрация</a>
+                    {% endif %}
                 </div>
             </div>
         </header>
@@ -90,7 +98,7 @@
                         <a href="{% url 'mock_section' 'gallery' %}"><i class="fas fa-images"></i> g/gallery</a>
                     </li>
                     <li class="sidebar-item {% if 'auth' in request.path %}active{% endif %}">
-                        <a href="{% url 'mock_section' 'auth' %}"><i class="fas fa-user-lock"></i> g/auth</a>
+                        <a href="{% url 'register' %}"><i class="fas fa-user-lock"></i> g/auth</a>
                     </li>
                 </ul>
                 

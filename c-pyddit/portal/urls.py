@@ -11,9 +11,15 @@ urlpatterns = [
     path('announcements/<int:pk>/edit/', views.announcement_edit, name='announcement_edit'),
     path('announcements/<int:pk>/delete/', views.announcement_delete, name='announcement_delete'),
     path('announcements/<int:pk>/like/', views.announcement_like, name='announcement_like'),
+<<<<<<< HEAD
     path('grades/', views.grades_list, name='grades_list'),
     path('grades/<int:pk>/like/', views.grade_like, name='grade_like'),
     path('grades/<int:pk>/dislike/', views.grade_dislike, name='grade_dislike'),
 
+=======
+    path('login/', views.UserLoginView.as_view(), name='login'),
+    path('logout/', views.logout_view, name='logout'),
+    path('register/', views.UserRegisterView.as_view(), name='register'),
+>>>>>>> e1df45c0a343a31f1f35b37edada6b42cdabeab1
     path('g/<str:section_name>/', views.mock_section, name='mock_section'),
 ]

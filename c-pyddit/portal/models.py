@@ -49,6 +49,7 @@ class Comment(models.Model):
         ordering = ['created_at']
         verbose_name = "Комментарий"
         verbose_name_plural = "Комментарии"
+<<<<<<< HEAD
 
 class Grade(models.Model):
     student_name = models.CharField(max_length=100, verbose_name="Имя студента")
@@ -75,3 +76,17 @@ class Grade(models.Model):
         ordering = ['-total_score', '-created_at']
         verbose_name = "Оценка"
         verbose_name_plural = "Оценки"
+=======
+class User(models.Model):
+    username = models.CharField(max_length=150, unique=True, verbose_name="Имя пользователя")
+    email = models.EmailField(unique=True, verbose_name="Электронная почта")
+    password = models.CharField(max_length=128, verbose_name="Пароль")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата регистрации")
+
+    def __str__(self):
+        return self.username
+
+    class Meta:
+        verbose_name = "Пользователь"
+        verbose_name_plural = "Пользователи"
+>>>>>>> e1df45c0a343a31f1f35b37edada6b42cdabeab1

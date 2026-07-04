@@ -1,9 +1,19 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+<<<<<<< HEAD
 from .models import Announcement, Comment, Grade
 from django.http import HttpResponseForbidden
 from datetime import date
 
+=======
+from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
+from django.contrib.auth.views import LoginView
+from django.urls import reverse_lazy
+from .models import Announcement, Comment, User
+from .forms import UserRegisterForm
+from django.http import HttpResponseForbidden
+from django.contrib.auth import logout
+>>>>>>> e1df45c0a343a31f1f35b37edada6b42cdabeab1
 def get_current_role(request):
     return request.session.get('role', 'User')  
 
@@ -273,6 +283,7 @@ def mock_section(request, section_name):
     }
     return render(request, 'portal/mock_section.html', context)
 
+<<<<<<< HEAD
 def grades_list(request):
     role = get_current_role(request)
     grades = Grade.objects.all()
@@ -342,3 +353,20 @@ def grade_dislike(request, pk):
             messages.success(request, "Спасибо за голос! -1 балл")
     
     return redirect(request.META.get('HTTP_REFERER', 'grades_list'))
+=======
+class UserRegisterView(CreateView):
+    model = User
+    form_class = UserRegisterForm
+    template_name = 'portal/register.html'
+    success_url = reverse_lazy('home')
+
+class UserLoginView(LoginView):
+    template_name = 'portal/login.html'
+    redirect_authenticated_user = True
+
+
+def logout_view(request):
+    """Log out the user and redirect to home. Accepts GET and POST."""
+    logout(request)
+    return redirect('home')
+>>>>>>> e1df45c0a343a31f1f35b37edada6b42cdabeab1
