@@ -31,17 +31,21 @@
                     </div>
                 </div>
 
-                <div class="post-footer" style="display: flex; gap: 12px;">
+                <div class="post-footer" style="display: flex; gap: 12px; flex-wrap: wrap; align-items:center;">
                     <a href="{% url 'survey_detail' survey.id %}" class="btn btn-secondary">
-                        <i class="fas fa-poll"></i> Ответить на опрос
+                        <i class="fas fa-poll"></i>
+                        {% if survey.user_has_submitted %}Посмотреть результаты{% else %}Ответить на опрос{% endif %}
                     </a>
-                    {% if role == 'Admin' %}
+                    {% if can_manage %}
                     <a href="/admin/portal/survey/{{ survey.id }}/change/" class="btn btn-secondary">
                         <i class="fas fa-edit"></i> Редактировать
                     </a>
                     <a href="/admin/portal/survey/{{ survey.id }}/delete/" class="btn btn-secondary" style="color: #ff4444;">
                         <i class="fas fa-trash"></i> Удалить
                     </a>
+                    {% endif %}
+                    {% if survey.user_has_submitted %}
+                    <span class="survey-status">Вы уже проходили этот опрос</span>
                     {% endif %}
                 </div>
             </div>
@@ -106,5 +110,11 @@
     padding-top: 12px;
     border-top: 1px solid var(--border-color);
 }
+
+    .survey-status {
+        color: var(--accent-orange);
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
 </style>
 {% endblock %}
