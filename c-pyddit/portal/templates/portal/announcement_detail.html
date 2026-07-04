@@ -44,6 +44,15 @@
             <div class="post-footer">
                 <span><i class="far fa-comment-alt"></i> {{ comments.count }} Комментариев</span>
                 <div class="post-actions">
+                    {% if role == 'Admin' or role == 'Moderator' %}
+                        <a href="{% url 'announcement_pin' announcement.pk %}" class="btn-action pin" style="color: var(--text-secondary); margin-right: 8px;">
+                            {% if announcement.is_pinned %}
+                                <i class="fas fa-thumbtack" style="color: var(--accent-orange);"></i> Открепить
+                            {% else %}
+                                <i class="fas fa-thumbtack"></i> Закрепить
+                            {% endif %}
+                        </a>
+                    {% endif %}
                     <a href="{% url 'announcement_edit' announcement.pk %}" class="btn-action edit">
                         <i class="fas fa-edit"></i> Редактировать
                     </a>

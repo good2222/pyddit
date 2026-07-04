@@ -20,12 +20,13 @@ class Announcement(models.Model):
     likes = models.IntegerField(default=0, verbose_name="Рейтинг (лайки)")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата обновления")
+    is_pinned = models.BooleanField(default=False, verbose_name="Закреплено")
 
     def __str__(self):
         return self.title
 
     class Meta:
-        ordering = ['-created_at']
+        ordering = ['-is_pinned', '-created_at']
         verbose_name = "Объявление"
         verbose_name_plural = "Объявления"
 
