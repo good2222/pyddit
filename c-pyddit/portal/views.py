@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from .models import Announcement, Comment
+from .models import Announcement, Comment, Survey, Question, Choice, Response
 from django.http import HttpResponseForbidden
-
+from .models import Announcement, Comment, Survey, Question, Choice
 def get_current_role(request):
     return request.session.get('role', 'User')  
 
@@ -271,3 +271,58 @@ def mock_section(request, section_name):
         'info': info
     }
     return render(request, 'portal/mock_section.html', context)
+
+
+def surveys_list(request):
+    """Вивести список всіх опитувань"""
+    role = get_current_role(request)
+    surveys = Survey.objects.all()
+    
+    context = {
+        'role': role,
+        'surveys': surveys,
+    }
+    return render(request, 'portal/surveys_list.html', context)
+
+
+def survey_detail(request, pk):
+    """Перегляд одного опитування та голосування"""
+    role = get_current_role(request)
+    survey = get_object_or_404(Survey, pk=pk)
+    questions = survey.questions.all()
+    submitted = False
+    results = {}
+    score = 0
+
+    if request.method == 'POST':
+        submitted = True
+        user_ident = request.session.session_key or 'anonymous'
+
+        for question in questions:
+            choice_id = request.POST.get(f'question_{question.id}')
+            if not choice_id:
+                continue
+            try:
+                choice = Choice.objects.get(id=choice_id, question=question)
+            except Choice.DoesNotExist:
+                continue
+
+            # increment votes and save response
+            choice.votes = (choice.votes or 0) + 1
+            choice.save()
+            Response.objects.create(survey=survey, choice=choice, user_identifier=user_ident)
+
+            is_correct = bool(choice.is_correct)
+            results[question.id] = {'question': question, 'selected': choice, 'correct': is_correct}
+            if is_correct:
+                score += 1
+    
+    context = {
+        'role': role,
+        'survey': survey,
+        'questions': questions,
+        'submitted': submitted,
+        'results': results,
+        'score': score,
+    }
+    return render(request, 'portal/survey_detail.html', context)

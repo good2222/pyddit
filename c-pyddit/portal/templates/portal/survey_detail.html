@@ -1,0 +1,250 @@
+{% extends 'portal/base.html' %}
+
+{% block title %}{{ survey.title }} - c/pyddit{% endblock %}
+
+{% block content %}
+<div class="content-area">
+    <div class="feed-container">
+        <div class="survey-header">
+            <a href="{% url 'surveys_list' %}" class="back-link">
+                <i class="fas fa-arrow-left"></i> Назад
+            </a>
+            <h2>{{ survey.title }}</h2>
+            <p class="survey-description">{{ survey.description }}</p>
+            <small style="color: var(--text-muted);">Создан: {{ survey.created_at|date:"d.m.Y H:i" }}</small>
+        </div>
+
+        {% if questions %}
+            <div class="survey-form">
+                <form method="POST" id="surveyForm">
+                    {% csrf_token %}
+                    {% for question in questions %}
+                    <div class="question-block">
+                        <h4>{{ forloop.counter }}. {{ question.text }}</h4>
+                        
+                        {% if question.choices.all %}
+                            <div class="choices-list">
+                                {% for choice in question.choices.all %}
+                                <label class="choice-item">
+                                    <input 
+                                        type="radio" 
+                                        name="question_{{ question.id }}" 
+                                        value="{{ choice.id }}"
+                                        class="choice-input"
+                                    >
+                                    <span class="choice-text">{{ choice.text }}</span>
+                                </label>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p style="color: var(--text-muted); font-size: 0.9rem;">Варианты ответов не добавлены</p>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-check"></i> Отправить ответы
+                        </button>
+                    </div>
+                </form>
+                </div>
+
+                {% if submitted %}
+                <div class="survey-results" style="margin-top:18px;">
+                    <h3>Результат: {{ score }} / {{ questions|length }}</h3>
+                    <div style="margin-top:12px;">
+                        {% for qid, info in results.items %}
+                            <div style="padding:10px; border:1px solid var(--border-color); margin-bottom:8px;">
+                                <strong>{{ info.question.text }}</strong>
+                                <div style="margin-top:8px;">
+                                    <span {% if info.correct %}style="color:green; font-weight:600;"{% else %}style="color:#ff4444;"{% endif %}>
+                                        {% if info.correct %}Правильно{% else %}Неправильно{% endif %}
+                                    </span>
+                                    <div style="margin-top:6px;">Ваш выбор: {{ info.selected.text }}</div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+            {% if role == 'Admin' %}
+            <div class="admin-section" style="margin-top: 32px;">
+                <h3>Администратор</h3>
+                <div style="display: flex; gap: 12px;">
+                    <a href="/admin/portal/survey/{{ survey.id }}/change/" class="btn btn-secondary">
+                        <i class="fas fa-edit"></i> Редактировать опрос
+                    </a>
+                    <a href="/admin/portal/survey/{{ survey.id }}/delete/" class="btn btn-secondary" style="color: #ff4444;">
+                        <i class="fas fa-trash"></i> Удалить опрос
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        {% else %}
+            <div class="post-card" style="text-align: center; padding: 40px;">
+                <i class="fas fa-question" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 16px;"></i>
+                <p style="color: var(--text-muted);">В этом опросе еще нет вопросов</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.survey-header {
+    margin-bottom: 32px;
+    padding: 24px;
+    background-color: var(--bg-secondary);
+    border-radius: 8px;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--accent-orange);
+    text-decoration: none;
+    margin-bottom: 12px;
+    font-size: 0.9rem;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+}
+
+.survey-header h2 {
+    margin: 12px 0 8px 0;
+}
+
+.survey-description {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    margin: 12px 0;
+}
+
+.survey-form {
+    background-color: var(--bg-secondary);
+    padding: 24px;
+    border-radius: 8px;
+    margin-bottom: 24px;
+}
+
+.question-block {
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.question-block:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.question-block h4 {
+    margin: 0 0 16px 0;
+    font-size: 1.05rem;
+    color: var(--text-primary);
+}
+
+.choices-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.choice-item {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.choice-item:hover {
+    background-color: var(--bg-tertiary);
+    border-color: var(--accent-orange);
+}
+
+.choice-input {
+    margin-right: 12px;
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+}
+
+.choice-text {
+    flex: 1;
+    color: var(--text-primary);
+}
+
+.form-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border-color);
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+.btn-primary {
+    background-color: var(--accent-orange);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #ff8c00;
+}
+
+.btn-secondary {
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+    background-color: var(--bg-secondary);
+}
+
+.admin-section {
+    padding: 24px;
+    background-color: var(--bg-secondary);
+    border-radius: 8px;
+    border-left: 4px solid var(--accent-orange);
+}
+
+.admin-section h3 {
+    margin-top: 0;
+    color: var(--accent-orange);
+}
+
+.admin-section > div {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+</style>
+
+<script>
+document.getElementById('surveyForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    alert('Спасибо за участие в опросе!');
+    this.submit();
+});
+</script>
+{% endblock %}
